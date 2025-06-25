@@ -25,9 +25,9 @@ public class KoiGameManager : MonoBehaviour {
     private Rect spawnBounds;
 
     void Awake() {
+        // Ensure a fresh GameManager each scene load
         if(Instance == null) {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         } else {
             Destroy(gameObject);
             return;
@@ -37,7 +37,9 @@ public class KoiGameManager : MonoBehaviour {
     void Start() {
         levelParams = KoiLevelManager.Instance.GetCurrentParameters();
 
-        var raw = FindFirstObjectByType<MovementBoundary>().GetWorldBounds();
+        KoiUIManager.Instance.InitializeUI(levelParams.advanceThreshold, levelParams.entityCount);
+
+        var boundary = FindObjectOfType<MovementBoundary>().GetWorldBounds();
         var srProto = entityPrefab.GetComponentInChildren<SpriteRenderer>();
         if(srProto == null) {
             Debug.LogError("entityPrefab requires a SpriteRenderer child for bounds calculation.");
@@ -46,22 +48,25 @@ public class KoiGameManager : MonoBehaviour {
         Vector2 halfSize = srProto.bounds.extents;
 
         spawnBounds = new Rect(
-            raw.xMin + halfSize.x,
-            raw.yMin + halfSize.y,
-            raw.width - halfSize.x * 2f,
-            raw.height - halfSize.y * 2f
+            boundary.xMin + halfSize.x,
+            boundary.yMin + halfSize.y,
+            boundary.width - halfSize.x * 2f,
+            boundary.height - halfSize.y * 2f
         );
 
         SpawnEntities(levelParams.entityCount, levelParams.entitySpeed);
         LevelTimeRemaining = levelParams.entityCount * levelParams.cooldownDuration + extraTime;
-        KoiUIManager.Instance.UpdateRemaining(levelParams.entityCount);
         KoiUIManager.Instance.UpdateTimer(LevelTimeRemaining);
         canSelect = true;
 
         StartCoroutine(LevelTimerRoutine());
-    }   
+    }
 
     private void SpawnEntities(int count, float speed) {
+        // Clear any old entities (if reusing the same manager)
+        foreach(var e in entities) if(e != null) Destroy(e.gameObject);
+        entities.Clear();
+
         for(int i = 0; i < count; i++) {
             var go = Instantiate(entityPrefab);
             float x = Random.Range(spawnBounds.xMin, spawnBounds.xMax);
@@ -106,15 +111,13 @@ public class KoiGameManager : MonoBehaviour {
     public void OnEntityFed() {
         fedCount++;
         KoiUIManager.Instance.UpdateRemaining(levelParams.entityCount - fedCount);
-        if(fedCount >= levelParams.entityCount)
-            EndRound(true);
+        if(fedCount >= levelParams.entityCount) EndRound(true);
     }
 
     public void OnWrongFeed() {
         wrongFeedCount++;
         KoiUIManager.Instance.UpdateWrongFeeds(wrongFeedCount);
-        if(wrongFeedCount > levelParams.advanceThreshold)
-            EndRound(false);
+        if(wrongFeedCount > levelParams.advanceThreshold) EndRound(false);
     }
 
     private void EndRound(bool success) {
@@ -130,17 +133,12 @@ public class KoiGameManager : MonoBehaviour {
             LevelTimeRemaining
         );
 
-        if(success)
-            KoiUIManager.Instance.ShowLevelComplete(fedCount, levelParams.entityCount, LevelTimeRemaining);
-        else
-            KoiUIManager.Instance.ShowGameOver();
+        if(success) KoiUIManager.Instance.ShowLevelComplete(fedCount, levelParams.entityCount, LevelTimeRemaining);
+        else KoiUIManager.Instance.ShowGameOver();
     }
 
+    // UI button handlers
     public void RetryLevel() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    public void NextLevel() {
-        Debug.Log("Loading next level...");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        
-    }
+    public void NextLevel() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     public void ReturnToMenu() => SceneManager.LoadScene("MainMenu");
 }

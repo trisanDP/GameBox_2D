@@ -1,6 +1,4 @@
-﻿
-
-// ===== MovementBoundary.cs =====
+﻿// ===== MovementBoundary.cs =====
 using UnityEngine;
 
 [ExecuteAlways]
@@ -14,7 +12,6 @@ public class MovementBoundary : MonoBehaviour {
             boundaryCollider = GetComponent<BoxCollider2D>();
     }
 
-    /// <summary>World-space rect of the collider</summary>
     public Rect GetWorldBounds() {
         if(boundaryCollider == null)
             return new Rect();
@@ -35,3 +32,4 @@ public class MovementBoundary : MonoBehaviour {
     }
 #endif
 }
+

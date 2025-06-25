@@ -10,7 +10,7 @@ public class InteractableEntity : MonoBehaviour {
 
     [Header("Visual Feedback")]
     [Tooltip("SpriteRenderer used to flash color on feed/miss")]
-    public SpriteRenderer whiteSprite; // Assign in Inspector for each prefab variation
+    public SpriteRenderer whiteSprite;
 
     private Rect movementBounds;
     private Vector2 direction;
@@ -30,15 +30,13 @@ public class InteractableEntity : MonoBehaviour {
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        // Ensure we have a SpriteRenderer reference
         if(whiteSprite == null) {
             whiteSprite = GetComponentInChildren<SpriteRenderer>();
             if(whiteSprite == null)
                 Debug.LogError($"[{name}] No SpriteRenderer found for visual feedback.");
         }
 
-        // Calculate movement bounds inset by half sprite size
-        var boundary = FindFirstObjectByType<MovementBoundary>();
+        var boundary = FindObjectOfType<MovementBoundary>();
         if(boundary != null && whiteSprite != null) {
             Rect raw = boundary.GetWorldBounds();
             Vector2 half = whiteSprite.bounds.extents;
@@ -59,12 +57,10 @@ public class InteractableEntity : MonoBehaviour {
 
     private void Move() {
         Vector2 next = rb.position + direction * speed * Time.fixedDeltaTime;
-        // Bounce X
         if(next.x < movementBounds.xMin || next.x > movementBounds.xMax) {
             direction.x = -direction.x;
             next.x = Mathf.Clamp(next.x, movementBounds.xMin, movementBounds.xMax);
         }
-        // Bounce Y
         if(next.y < movementBounds.yMin || next.y > movementBounds.yMax) {
             direction.y = -direction.y;
             next.y = Mathf.Clamp(next.y, movementBounds.yMin, movementBounds.yMax);
@@ -103,3 +99,4 @@ public class InteractableEntity : MonoBehaviour {
         whiteSprite.color = original;
     }
 }
+

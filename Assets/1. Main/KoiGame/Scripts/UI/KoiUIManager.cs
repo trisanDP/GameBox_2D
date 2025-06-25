@@ -1,4 +1,4 @@
-﻿// KoiUIManager.cs
+﻿// ===== KoiUIManager.cs =====
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
@@ -29,17 +29,18 @@ public class KoiUIManager : MonoBehaviour {
         if(Instance == null) Instance = this;
         else Destroy(gameObject);
     }
-    private void Start() {
-        HideUI();    
+
+    void Start() {
+        HideUI();
     }
 
     public void HideUI() {
         gameOverPanel.SetActive(false);
         levelCompletePanel.SetActive(false);
     }
+
     public void InitializeUI(int threshold, int totalEntities) {
-        gameOverPanel.SetActive(false);
-        levelCompletePanel.SetActive(false);
+        HideUI();
         UpdateWrongFeeds(0);
         UpdateRemaining(totalEntities);
         retryButton.onClick.AddListener(KoiGameManager.Instance.RetryLevel);
