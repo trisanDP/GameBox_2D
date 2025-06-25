@@ -1,23 +1,34 @@
+﻿
+
+// ===== MovementBoundary.cs =====
 using UnityEngine;
 
 [ExecuteAlways]
+[RequireComponent(typeof(BoxCollider2D))]
 public class MovementBoundary : MonoBehaviour {
-    [Tooltip("Area where entities can move (based on this BoxCollider2D)")]
+    [Tooltip("Defines where entities can move")]
     public BoxCollider2D boundaryCollider;
 
+    void OnValidate() {
+        if(boundaryCollider == null)
+            boundaryCollider = GetComponent<BoxCollider2D>();
+    }
+
+    /// <summary>World-space rect of the collider</summary>
     public Rect GetWorldBounds() {
         if(boundaryCollider == null)
             return new Rect();
 
-        Vector2 size = boundaryCollider.size;
-        Vector2 center = (Vector2)boundaryCollider.transform.position + boundaryCollider.offset;
-        return new Rect(center - size / 2f, size);
+        Bounds b = boundaryCollider.bounds;
+        return new Rect(
+            new Vector2(b.min.x, b.min.y),
+            new Vector2(b.size.x, b.size.y)
+        );
     }
 
 #if UNITY_EDITOR
     void OnDrawGizmos() {
         if(boundaryCollider == null) return;
-
         Gizmos.color = Color.cyan;
         Rect r = GetWorldBounds();
         Gizmos.DrawWireCube(r.center, r.size);

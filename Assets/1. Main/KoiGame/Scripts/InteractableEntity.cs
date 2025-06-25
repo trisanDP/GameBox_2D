@@ -1,53 +1,75 @@
-// InteractableEntity.cs
-using UnityEngine;
+﻿// ===== InteractableEntity.cs =====
 using System.Collections;
+using UnityEngine;
 
-[RequireComponent(typeof(SpriteRenderer), typeof(Collider2D))]
+[RequireComponent(typeof(Collider2D), typeof(Rigidbody2D))]
 public class InteractableEntity : MonoBehaviour {
-
-    #region Inspector Settings
-    [Tooltip("Movement speed in units per second")]
+    [Header("Movement")]
+    [Tooltip("Speed in units per second")]
     public float speed = 2f;
-    [Tooltip("Rect area (in world units) within which this entity may move")]
-    private Rect movementBounds = new Rect();
-    #endregion
 
-    #region Runtime State
+    [Header("Visual Feedback")]
+    [Tooltip("SpriteRenderer used to flash color on feed/miss")]
+    public SpriteRenderer whiteSprite; // Assign in Inspector for each prefab variation
+
+    private Rect movementBounds;
     private Vector2 direction;
-    private SpriteRenderer spriteRenderer;
-    public bool HasBeenFed { get; private set; }
-    #endregion
+    private bool isPaused = false;
+    private Rigidbody2D rb;
+    private bool hasBeenFed = false;
+
+    public bool HasBeenFed => hasBeenFed;
 
     void Awake() {
-        spriteRenderer = GetComponent<SpriteRenderer>();
         PickRandomDirection();
     }
+
     void Start() {
+        rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0f;
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+        // Ensure we have a SpriteRenderer reference
+        if(whiteSprite == null) {
+            whiteSprite = GetComponentInChildren<SpriteRenderer>();
+            if(whiteSprite == null)
+                Debug.LogError($"[{name}] No SpriteRenderer found for visual feedback.");
+        }
+
+        // Calculate movement bounds inset by half sprite size
         var boundary = FindFirstObjectByType<MovementBoundary>();
-        if(boundary != null)
-            movementBounds = boundary.GetWorldBounds();
-        else
-            Debug.LogWarning("No MovementBoundary found in scene.");
+        if(boundary != null && whiteSprite != null) {
+            Rect raw = boundary.GetWorldBounds();
+            Vector2 half = whiteSprite.bounds.extents;
+            movementBounds = new Rect(
+                raw.xMin + half.x,
+                raw.yMin + half.y,
+                raw.width - half.x * 2f,
+                raw.height - half.y * 2f
+            );
+        } else {
+            Debug.LogWarning($"[{name}] MovementBoundary or SpriteRenderer missing.");
+        }
     }
 
-    void Update() {
-        Move();
+    void FixedUpdate() {
+        if(!isPaused) Move();
     }
 
     private void Move() {
-        Vector2 pos = (Vector2)transform.position + direction * speed * Time.deltaTime;
-
-        // Bounce off bounds
-        if(pos.x < movementBounds.xMin || pos.x > movementBounds.xMax) {
+        Vector2 next = rb.position + direction * speed * Time.fixedDeltaTime;
+        // Bounce X
+        if(next.x < movementBounds.xMin || next.x > movementBounds.xMax) {
             direction.x = -direction.x;
-            pos.x = Mathf.Clamp(pos.x, movementBounds.xMin, movementBounds.xMax);
+            next.x = Mathf.Clamp(next.x, movementBounds.xMin, movementBounds.xMax);
         }
-        if(pos.y < movementBounds.yMin || pos.y > movementBounds.yMax) {
+        // Bounce Y
+        if(next.y < movementBounds.yMin || next.y > movementBounds.yMax) {
             direction.y = -direction.y;
-            pos.y = Mathf.Clamp(pos.y, movementBounds.yMin, movementBounds.yMax);
+            next.y = Mathf.Clamp(next.y, movementBounds.yMin, movementBounds.yMax);
         }
-
-        transform.position = pos;
+        rb.MovePosition(next);
     }
 
     private void PickRandomDirection() {
@@ -56,30 +78,28 @@ public class InteractableEntity : MonoBehaviour {
     }
 
     void OnMouseDown() {
-        // Called on both mouse click (Editor) and touch (mobile)
-        if(KoiGameManager.Instance.CanSelect)
-            KoiGameManager.Instance.OnEntitySelected(this);
+        if(!KoiGameManager.Instance.CanSelect) return;
+        isPaused = true;
+        KoiGameManager.Instance.OnEntitySelected(this);
     }
 
-    /// <summary>
-    /// Called by the projectile when it reaches this entity.
-    /// </summary>
     public void Feed() {
-        if(!HasBeenFed) {
-            HasBeenFed = true;
+        if(!hasBeenFed) {
+            hasBeenFed = true;
             StartCoroutine(Flash(Color.blue));
-            KoiGameManager.Instance.OnEntityFed(this);
+            KoiGameManager.Instance.OnEntityFed();
         } else {
             StartCoroutine(Flash(Color.red));
             KoiGameManager.Instance.OnWrongFeed();
         }
+        isPaused = false;
     }
 
     private IEnumerator Flash(Color flashColor) {
-        Color original = spriteRenderer.color;
-        spriteRenderer.color = flashColor;
+        if(whiteSprite == null) yield break;
+        Color original = whiteSprite.color;
+        whiteSprite.color = flashColor;
         yield return new WaitForSeconds(0.3f);
-        spriteRenderer.color = original;
-    }   
-
+        whiteSprite.color = original;
+    }
 }

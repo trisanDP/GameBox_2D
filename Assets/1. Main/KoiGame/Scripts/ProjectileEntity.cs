@@ -9,9 +9,7 @@ public class ProjectileEntity : MonoBehaviour {
 
     private InteractableEntity target;
 
-    /// <summary>
     /// Initialize this projectile with the entity it should feed.
-    /// </summary>
     public void Initialize(InteractableEntity entity) {
         target = entity;
     }
