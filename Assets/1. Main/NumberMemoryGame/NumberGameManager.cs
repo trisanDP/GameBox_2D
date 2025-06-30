@@ -2,33 +2,44 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NumberGameManager : MonoBehaviour {
     [Header("Game Settings")]
-    public int startCount = 5;            // Starting number of tiles
-    public float revealTime = 5f;         // Time to show numbers before hiding
-    public GameObject tilePrefab;         // Prefab for the number tile
-    public Transform tileContainer;       // Parent for spawned tiles
-    public RectTransform spawnArea;       // UI area where tiles can appear
-    public  NumberUIManager uiManager;           // Reference to UI manager
+    public int startCount = 5;
+    public float revealTime = 5f;
+    public GameObject tilePrefab;
+    public Transform tileContainer;
+    public RectTransform spawnArea;
+    public NumberUIManager uiManager;
+    public int maxMistakes = 1;
 
     private int currentCount;
-    private int nextIndex = 1;
-    private int mistakes = 0;
+    private int nextIndex;
+    private int mistakes;
     private List<NumberTile> tiles = new List<NumberTile>();
+    private List<Rect> occupiedRects = new List<Rect>();
+    private float levelStartTime;
 
     void Start() {
+        Time.timeScale = 1f; // Ensure game unpaused on start
         NumberLevelManager.Instance.ResetLevel(startCount);
-        BeginRound();
+        uiManager = GetComponent<NumberUIManager>();
+        uiManager.onPauseRequested += PauseGame;
+        StartRound();
     }
 
-    public void BeginRound() {
+    void StartRound() {
         ClearTiles();
+        Debug.Log("Starting new round with count: " + currentCount);
+        occupiedRects.Clear();
         currentCount = NumberLevelManager.Instance.CurrentCount;
         nextIndex = 1;
         mistakes = 0;
+        levelStartTime = Time.time;
 
         uiManager.SetLevel(currentCount);
+        uiManager.HideAllPanels();
         uiManager.ShowFeedback("Memorize the positions!");
 
         SpawnTiles(currentCount);
@@ -36,79 +47,83 @@ public class NumberGameManager : MonoBehaviour {
     }
 
     void SpawnTiles(int count) {
-        tiles.Clear();
-        List<int> numbers = new List<int>();
-        for(int i = 1; i <= count; i++) numbers.Add(i);
+        Rect area = spawnArea.rect;
+        Vector2 areaPos = spawnArea.anchoredPosition;
 
-        // Calculate spawn bounds in local UI space
-        Rect r = spawnArea.rect;
-        Vector2 areaOffset = spawnArea.anchoredPosition;
-
-        for(int i = 0; i < count; i++) {
+        for(int i = 1; i <= count; i++) {
             GameObject go = Instantiate(tilePrefab, tileContainer);
             var tile = go.GetComponent<NumberTile>();
-            int randIdx = Random.Range(0, numbers.Count);
-            tile.Initialize(numbers[randIdx], OnTileSelected);
-            numbers.RemoveAt(randIdx);
-
-            // Random position within spawnArea bounds
-            float x = Random.Range(r.xMin, r.xMax);
-            float y = Random.Range(r.yMin, r.yMax);
+            tile.Initialize(i, OnTileSelected);
+            tile.EnableInteraction(false); // disable until numbers hidden
             RectTransform rt = go.GetComponent<RectTransform>();
-            // Add spawnArea's anchored position to get correct local position
-            rt.anchoredPosition = new Vector2(areaOffset.x + x, areaOffset.y + y);
+            Vector2 size = rt.sizeDelta;
 
-            // Optional random rotation
-            rt.rotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+            Rect newRect;
+            int attempts = 0;
+            do {
+                float x = Random.Range(area.xMin, area.xMax);
+                float y = Random.Range(area.yMin, area.yMax);
+                Vector2 pos = new Vector2(areaPos.x + x, areaPos.y + y);
+                rt.anchoredPosition = pos;
+                newRect = new Rect(pos - size * 0.5f, size);
+                attempts++;
+                if(attempts > 50) break;
+            }
+            while(occupiedRects.Exists(r => r.Overlaps(newRect)));
 
+            occupiedRects.Add(newRect);
             tiles.Add(tile);
         }
     }
 
-    // === MODIFICATIONS ===
-    // - SpawnTiles: adjusted position calculation to account for spawnArea's anchoredPosition,
-    //   ensuring tiles spawn within the defined RectTransform region in UI space.
-    // - No collider-based spawn; instead SpawnArea is a UI RectTransform.
-    // - MenuManager unchanged except scene name update.
-
-
-
     IEnumerator HideNumbersAfterDelay() {
-    yield return new WaitForSeconds(revealTime);
-    foreach(var t in tiles)
-        t.HideNumber();
-
-    uiManager.ShowFeedback("Select squares in ascending order!");
-}
-
-void OnTileSelected(NumberTile tile) {
-    if(tile.Number == nextIndex) {
-        tile.MarkCorrect();
-        nextIndex++;
-        if(nextIndex > currentCount) {
-            // Round complete
-            uiManager.ShowFeedback("Well done! Level up.");
-            NumberLevelManager.Instance.LevelUp();
-            BeginRound();
+        yield return new WaitForSeconds(revealTime);
+        foreach(var t in tiles) {
+            t.HideNumber();
+            t.EnableInteraction(true); // enable after hiding
         }
-    } else {
-        mistakes++;
-        tile.MarkWrong();
-        uiManager.ShowFeedback("Wrong tile!");
-        if(mistakes >= 1) {
-            GameOver();
+        uiManager.ShowFeedback("Select in ascending order!");
+    }
+
+    void OnTileSelected(NumberTile tile) {
+        if(tile.Number == nextIndex) {
+            tile.MarkCorrect(Color.blue);
+            nextIndex++;
+            if(nextIndex > currentCount) {
+                float timeTaken = Time.time - levelStartTime;
+                uiManager.ShowNextLevelPanel(timeTaken);
+            }
+        } else {
+            mistakes++;
+            tile.MarkWrong(Color.red);
+            if(mistakes > maxMistakes) {
+                uiManager.ShowGameOverPanel();
+            }
         }
     }
-}
 
-void GameOver() {
-    uiManager.ShowFeedback("Game Over! Restarting.");
-    NumberLevelManager.Instance.ResetLevel(startCount);
-    BeginRound();
-}
+    public void OnRetry() {
+        StartRound();
+    }
 
-void ClearTiles() {
-    foreach(Transform child in tileContainer)
-        Destroy(child.gameObject);
-}
+    public void OnNextLevel() {
+        NumberLevelManager.Instance.LevelUp();
+        StartRound();
+    }
+
+    void PauseGame() {
+        Time.timeScale = 0f;
+        uiManager.ShowPausePanel();
+    }
+
+    public void UnpauseGame() {
+        Time.timeScale = 1f;
+        uiManager.HidePausePanel();
+    }
+
+    void ClearTiles() {
+        foreach(Transform c in tileContainer)
+            Destroy(c.gameObject);
+        tiles.Clear();
+    }
 }

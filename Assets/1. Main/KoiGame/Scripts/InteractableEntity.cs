@@ -36,7 +36,7 @@ public class InteractableEntity : MonoBehaviour {
                 Debug.LogError($"[{name}] No SpriteRenderer found for visual feedback.");
         }
 
-        var boundary = FindObjectOfType<MovementBoundary>();
+        var boundary = FindFirstObjectByType<MovementBoundary>();
         if(boundary != null && whiteSprite != null) {
             Rect raw = boundary.GetWorldBounds();
             Vector2 half = whiteSprite.bounds.extents;

@@ -1,71 +1,38 @@
+
 // NumberTile.cs
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 public class NumberTile : MonoBehaviour {
-    [Header("Visuals")]
     public Image backgroundImage;
     public TMP_Text numberText;
     public Button button;
-
     public int Number { get; private set; }
     private System.Action<NumberTile> onSelected;
-    private bool isHidden = false;
-    private bool isClickable = true;
+    private bool isClickable;
 
-    /// <summary>
-    /// Initialize the tile with a number and callback.
-    /// </summary>
     public void Initialize(int number, System.Action<NumberTile> callback) {
-        // Clean up any previous listeners
-        if(button != null)
-            button.onClick.RemoveAllListeners();
-
         Number = number;
         numberText.text = number.ToString();
         onSelected = callback;
-        isHidden = false;
-        isClickable = true;
-
-        // Reset visuals
+        isClickable = false;
         backgroundImage.color = Color.white;
         numberText.gameObject.SetActive(true);
-
-        // Assign button listener to invoke the same selection logic
-        if(button != null)
-            button.onClick.AddListener(OnButtonClick);
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() => OnSelected());
     }
 
-    /// <summary>
-    /// Hide the number, showing only the square.
-    /// </summary>
-    public void HideNumber() {
-        isHidden = true;
-        numberText.gameObject.SetActive(false);
+    public void EnableInteraction(bool enabled) {
+        isClickable = enabled;
+        if(button != null) button.interactable = enabled;
     }
 
-    /// <summary>
-    /// Shared click handler for the UI Button.
-    /// </summary>
-    private void OnButtonClick() {
-        if(!isClickable) return;
-        onSelected?.Invoke(this);
-    }
+    public void HideNumber() => numberText.gameObject.SetActive(false);
 
-    /// <summary>
-    /// Mark tile as correctly selected.
-    /// </summary>
-    public void MarkCorrect() {
-        isClickable = false;
-        backgroundImage.color = Color.green;
-    }
+    private void OnSelected() { if(isClickable) onSelected?.Invoke(this); }
 
-    /// <summary>
-    /// Mark tile as wrongly selected.
-    /// </summary>
-    public void MarkWrong() {
-        isClickable = false;
-        backgroundImage.color = Color.red;
-    }
+    public void MarkCorrect(Color c) { isClickable = false; backgroundImage.color = c; }
+    public void MarkWrong(Color c) { isClickable = false; backgroundImage.color = c; }
 }
+

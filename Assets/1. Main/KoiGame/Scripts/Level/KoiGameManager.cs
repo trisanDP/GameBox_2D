@@ -39,7 +39,7 @@ public class KoiGameManager : MonoBehaviour {
 
         KoiUIManager.Instance.InitializeUI(levelParams.advanceThreshold, levelParams.entityCount);
 
-        var boundary = FindObjectOfType<MovementBoundary>().GetWorldBounds();
+        var boundary = FindFirstObjectByType<MovementBoundary>().GetWorldBounds();
         var srProto = entityPrefab.GetComponentInChildren<SpriteRenderer>();
         if(srProto == null) {
             Debug.LogError("entityPrefab requires a SpriteRenderer child for bounds calculation.");
@@ -74,6 +74,7 @@ public class KoiGameManager : MonoBehaviour {
             go.transform.position = new Vector3(x, y, 0);
 
             var entity = go.GetComponent<InteractableEntity>();
+            speed = 1.3f;
             entity.speed = speed;
             entities.Add(entity);
         }
