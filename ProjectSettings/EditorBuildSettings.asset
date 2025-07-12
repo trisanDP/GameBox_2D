@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/NumberGame_Memory.unity
     guid: 775bb55d38589164192ac0eb2304aea1
+  - enabled: 1
+    path: Assets/Scenes/ColorClash_Inhivitory Control.unity
+    guid: 1c448638b5a59c446814e0a5340edd75
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: b183eb9b203a1fa439bc4a2be1dffa22, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 5a9587a13a63dee4caaa14f885fcd23f, type: 2}

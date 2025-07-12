@@ -18,6 +18,12 @@ public class KoiUIManager : MonoBehaviour {
     public Button retryButton;
     public Button gameOverMenuButton;
 
+    [Header("Pause")]
+    public GameObject pausePanel;
+    public Button pauseButton;
+    public Button pauseResumeButton;
+    public Button pauseMainMenuButton;
+
     [Header("Level Complete Panel")]
     public GameObject levelCompletePanel;
     public TextMeshProUGUI scoreText;
@@ -28,14 +34,21 @@ public class KoiUIManager : MonoBehaviour {
     void Awake() {
         if(Instance == null) Instance = this;
         else Destroy(gameObject);
+
     }
 
     void Start() {
         HideUI();
+
+        pauseButton.onClick.AddListener(PauseGame);
+        pauseResumeButton.onClick.AddListener(ResumeGame);
+        pauseMainMenuButton.onClick.AddListener(KoiGameManager.Instance.ReturnToMenu);
+
     }
 
     public void HideUI() {
         gameOverPanel.SetActive(false);
+        pausePanel.SetActive(false);
         levelCompletePanel.SetActive(false);
     }
 
@@ -66,11 +79,11 @@ public class KoiUIManager : MonoBehaviour {
     }
 
     public void UpdateRemaining(int remaining) {
-        remainingText.text = $"Remaining: {remaining}";
+        remainingText.text = $"Remaining {remaining}";
     }
 
     public void UpdateTimer(float timeLeft) {
-        timerText.text = $"Time: {timeLeft:0.0}s";
+        timerText.text = $"Time: {(int)timeLeft:0}s";
     }
 
     public void ShowGameOver() {
@@ -82,4 +95,26 @@ public class KoiUIManager : MonoBehaviour {
         scoreText.text = $"Fed: {fedCount}/{totalEntities}";
         timeText.text = $"Time Left: {timeLeft:0.0}s";
     }
+
+    #region Pause Menu
+
+    public void ShowPauseMenu() {
+        pausePanel.SetActive(true);
+        pauseButton.gameObject.SetActive(false);
+        pauseResumeButton.onClick.AddListener(ResumeGame);
+        pauseMainMenuButton.onClick.AddListener(KoiGameManager.Instance.ReturnToMenu);
+    }
+    public void HidePauseMenu() {
+        pausePanel.SetActive(false);
+        pauseButton.gameObject.SetActive(true);
+    }
+    public void PauseGame() {
+        Time.timeScale = 0f;
+        ShowPauseMenu();
+    }
+    public void ResumeGame() {
+        Time.timeScale = 1f;
+        HidePauseMenu();
+    }
+    #endregion
 }

@@ -1,4 +1,5 @@
 ﻿// ===== KoiGameManager.cs =====
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,22 +8,16 @@ using UnityEngine.SceneManagement;
 public class KoiGameManager : MonoBehaviour {
     public static KoiGameManager Instance { get; private set; }
 
-    [Header("Gameplay Prefabs")]
-    public GameObject entityPrefab;
-    public GameObject projectilePrefab;
-
-    [Header("Level Timer Settings")]
-    [Tooltip("Additional seconds to add on top of entityCount * cooldown + extraTime")]
-    public float extraTime = 4f;
-
-    [Header("Runtime State (read-only)")]
-    public float LevelTimeRemaining { get; private set; }
+    [Header("Gameplay Prefabs")] public GameObject entityPrefab, projectilePrefab;
+    [Header("Timer Settings")] public float extraTime = 4f;
+    [Header("Runtime State")] public float LevelTimeRemaining { get; private set; }
 
     private LevelParameters levelParams;
-    private List<InteractableEntity> entities = new List<InteractableEntity>();
+    private List<InteractableEntity> entities = new();
     private int fedCount, wrongFeedCount;
     private bool canSelect;
     private Rect spawnBounds;
+
 
     void Awake() {
         // Ensure a fresh GameManager each scene load
@@ -69,8 +64,8 @@ public class KoiGameManager : MonoBehaviour {
 
         for(int i = 0; i < count; i++) {
             var go = Instantiate(entityPrefab);
-            float x = Random.Range(spawnBounds.xMin, spawnBounds.xMax);
-            float y = Random.Range(spawnBounds.yMin, spawnBounds.yMax);
+            float x = UnityEngine.Random.Range(spawnBounds.xMin, spawnBounds.xMax);
+            float y = UnityEngine.Random.Range(spawnBounds.yMin, spawnBounds.yMax);
             go.transform.position = new Vector3(x, y, 0);
 
             var entity = go.GetComponent<InteractableEntity>();
@@ -124,15 +119,17 @@ public class KoiGameManager : MonoBehaviour {
     private void EndRound(bool success) {
         StopAllCoroutines();
         bool perfect = (wrongFeedCount == 0);
-
         KoiLevelManager.Instance.ReportRoundEnd(success, perfect);
-        ScoreManager.Instance.AddScore(
-            "KoiGame",
-            levelParams.levelIndex,
-            fedCount,
-            levelParams.entityCount,
-            LevelTimeRemaining
-        );
+
+        // Save with GlobalScoreManager using generic KoiScoreEntry
+        var entry = new KoiScoreEntry {
+            levelIndex = levelParams.levelIndex,
+            fedCount = fedCount,
+            totalEntities = levelParams.entityCount,
+            timeLeft = LevelTimeRemaining,
+            timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        };
+        GlobalScoreManager.Instance.AddScore("KoiGame", entry);
 
         if(success) KoiUIManager.Instance.ShowLevelComplete(fedCount, levelParams.entityCount, LevelTimeRemaining);
         else KoiUIManager.Instance.ShowGameOver();
