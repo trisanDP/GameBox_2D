@@ -6,16 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
+    path: Assets/2. Scene/MainMenu.unity
     guid: a5a4a73253fe18f479467dc14e1d655d
   - enabled: 1
-    path: Assets/Scenes/KoiGame_Attention.unity
+    path: Assets/2. Scene/KoiGame_Attention.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
-    path: Assets/Scenes/NumberGame_Memory.unity
+    path: Assets/2. Scene/NumberGame_Memory.unity
     guid: 775bb55d38589164192ac0eb2304aea1
   - enabled: 1
-    path: Assets/Scenes/ColorClash_Inhivitory Control.unity
+    path: Assets/2. Scene/ColorClash_Inhivitory Control.unity
     guid: 1c448638b5a59c446814e0a5340edd75
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: b183eb9b203a1fa439bc4a2be1dffa22, type: 2}
