@@ -1,0 +1,132 @@
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public class GameScoresJson {
+    public string gameName;
+    public List<string> entriesJson;
+}
+
+[Serializable]
+public class AllGameScoresJson {
+    public List<GameScoresJson> games = new List<GameScoresJson>();
+}
+
+public class GlobalScoreManager : MonoBehaviour {
+    #region Singleton
+    public static GlobalScoreManager Instance { get; private set; }
+    void Awake() {
+        if(Instance == null) {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            LoadAllScores();
+        } else Destroy(gameObject);
+    }
+    #endregion
+
+    #region Fields
+    private const string Key = "GlobalScores";
+    private AllGameScoresJson allScores = new AllGameScoresJson();
+    #endregion
+
+    #region Public Methods
+
+    /// Adds a typed score entry for the specified game.
+    public void AddScore<T>(string gameName, T entry) where T : class {
+        Debug.Log("Adding score for game: " + gameName);
+        string entryJson = JsonUtility.ToJson(entry);
+        var game = allScores.games.Find(g => g.gameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+        if(game == null) {
+            game = new GameScoresJson { gameName = gameName, entriesJson = new List<string>() };
+            allScores.games.Add(game);
+        }
+        game.entriesJson.Add(entryJson);
+        SaveAllScores();
+    }
+
+    /// Retrieves typed score entries for the specified game.
+    public List<T> GetScores<T>(string gameName) where T : class {
+        var game = allScores.games.Find(g => g.gameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+        var list = new List<T>();
+        if(game == null) return list;
+        foreach(var json in game.entriesJson) {
+            try {
+                var obj = JsonUtility.FromJson<T>(json);
+                if(obj != null) list.Add(obj);
+            } catch {
+                Debug.LogWarning($"Failed to parse score entry for {gameName}");
+            }
+        }
+        Debug.Log("Retrieved " + list.Count + " scores for game: " + gameName);
+        return list;
+    }
+
+    public void ClearAllScores() {
+        allScores.games.Clear();
+        PlayerPrefs.DeleteKey(Key);
+        PlayerPrefs.Save();
+    }
+
+
+
+    public void ClearScoresForGame(string gameName) {
+        allScores.games.RemoveAll(g => g.gameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+        SaveAllScores();
+    }
+    #endregion
+
+    #region Persistence
+    private void SaveAllScores() {
+        string json = JsonUtility.ToJson(allScores);
+        PlayerPrefs.SetString(Key, json);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadAllScores() {
+        if(PlayerPrefs.HasKey(Key)) {
+            string json = PlayerPrefs.GetString(Key);
+            allScores = JsonUtility.FromJson<AllGameScoresJson>(json) ?? new AllGameScoresJson();
+        }
+    }
+    #endregion
+}
+
+#region --- Updated Base and Derived ScoreEntry Classes ---
+[Serializable]
+public abstract class ScoreEntry {
+    public string timestamp;
+    public abstract int GetScoreValue();
+}
+
+
+[Serializable]
+public class KoiScoreEntry : ScoreEntry {
+    public int levelIndex;
+    public int fedCount;
+    public int totalEntities;
+    public float timeLeft;
+
+    public override int GetScoreValue() {
+        float ratio = totalEntities > 0 ? (float)fedCount / totalEntities : 0;
+        return Mathf.RoundToInt(ratio * 100 + timeLeft);
+    }
+}
+
+
+[Serializable]
+public class NumberGameScoreEntry : ScoreEntry {
+    public int correctCount;
+    public int totalCount;
+    public override int GetScoreValue() {
+        return totalCount > 0 ? Mathf.RoundToInt((float)correctCount / totalCount * 100) : 0;
+    }
+}
+
+
+[Serializable]
+public class ColorClashScoreEntry : ScoreEntry {
+    public int finalScore;
+    public override int GetScoreValue() => finalScore;
+}
+#endregion
