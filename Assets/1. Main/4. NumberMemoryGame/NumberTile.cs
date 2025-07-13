@@ -1,4 +1,3 @@
-
 // NumberTile.cs
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,8 +7,6 @@ public class NumberTile : MonoBehaviour {
     public Image backgroundImage;
     public TMP_Text numberText;
     public Button button;
-
-    public Color defaultColor = Color.black;
     public int Number { get; private set; }
     private System.Action<NumberTile> onSelected;
     private bool isClickable;
@@ -19,7 +16,7 @@ public class NumberTile : MonoBehaviour {
         numberText.text = number.ToString();
         onSelected = callback;
         isClickable = false;
-        backgroundImage.color = defaultColor;
+        backgroundImage.color = Color.black;
         numberText.gameObject.SetActive(true);
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => OnSelected());
@@ -37,4 +34,3 @@ public class NumberTile : MonoBehaviour {
     public void MarkCorrect(Color c) { isClickable = false; backgroundImage.color = c; }
     public void MarkWrong(Color c) { isClickable = false; backgroundImage.color = c; }
 }
-

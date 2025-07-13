@@ -102,7 +102,7 @@ public class ScoreUIManager : MonoBehaviour {
 
     private void PopulateNumberGame() {
         ClearChildren(numberContent);
-        var list = GlobalScoreManager.Instance?.GetScores<NumberGameScoreEntry>("NumberGame");
+        var list = GlobalScoreManager.Instance?.GetScores<NumberGameLevelScoreEntry>("NumberGame");
         if(list == null || list.Count == 0) {
             CreateItem(numberContent, 1, 0);
             return;

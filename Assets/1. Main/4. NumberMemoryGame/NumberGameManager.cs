@@ -13,6 +13,7 @@ public class NumberGameManager : MonoBehaviour {
     public RectTransform spawnArea;
     public NumberUIManager uiManager;
     public int maxMistakes = 1;
+    public int scorePerLevel = 100; // Score awarded per passed level
 
     private int currentCount;
     private int nextIndex;
@@ -22,7 +23,7 @@ public class NumberGameManager : MonoBehaviour {
     private float levelStartTime;
 
     void Start() {
-        Time.timeScale = 1f; // Ensure game unpaused on start
+        Time.timeScale = 1f; // Ensure unpaused
         NumberLevelManager.Instance.ResetLevel(startCount);
         uiManager = GetComponent<NumberUIManager>();
         uiManager.onPauseRequested += PauseGame;
@@ -31,7 +32,6 @@ public class NumberGameManager : MonoBehaviour {
 
     void StartRound() {
         ClearTiles();
-        Debug.Log("Starting new round with count: " + currentCount);
         occupiedRects.Clear();
         currentCount = NumberLevelManager.Instance.CurrentCount;
         nextIndex = 1;
@@ -54,7 +54,8 @@ public class NumberGameManager : MonoBehaviour {
             GameObject go = Instantiate(tilePrefab, tileContainer);
             var tile = go.GetComponent<NumberTile>();
             tile.Initialize(i, OnTileSelected);
-            tile.EnableInteraction(false); // disable until numbers hidden
+            tile.EnableInteraction(false);
+
             RectTransform rt = go.GetComponent<RectTransform>();
             Vector2 size = rt.sizeDelta;
 
@@ -80,7 +81,7 @@ public class NumberGameManager : MonoBehaviour {
         yield return new WaitForSeconds(revealTime);
         foreach(var t in tiles) {
             t.HideNumber();
-            t.EnableInteraction(true); // enable after hiding
+            t.EnableInteraction(true);
         }
         uiManager.ShowFeedback("Select in ascending order!");
     }
@@ -91,15 +92,28 @@ public class NumberGameManager : MonoBehaviour {
             nextIndex++;
             if(nextIndex > currentCount) {
                 float timeTaken = Time.time - levelStartTime;
+                int levelsPassed = NumberLevelManager.Instance.CurrentCount - startCount + 1;
+                RecordScore(levelsPassed);
                 uiManager.ShowNextLevelPanel(timeTaken);
             }
         } else {
             mistakes++;
             tile.MarkWrong(Color.red);
             if(mistakes > maxMistakes) {
+                int levelsPassed = NumberLevelManager.Instance.CurrentCount - startCount;
+                RecordScore(levelsPassed);
                 uiManager.ShowGameOverPanel();
             }
         }
+    }
+
+    void RecordScore(int levelsPassed) {
+        var entry = new NumberGameLevelScoreEntry {
+            levelPassed = levelsPassed,
+            scorePerLevel = scorePerLevel
+        };
+        GlobalScoreManager.Instance.AddScore("NumberGame", entry);
+        Debug.Log($"Recorded NumberGame score: {entry.GetScoreValue()}");
     }
 
     public void OnRetry() {
@@ -127,3 +141,4 @@ public class NumberGameManager : MonoBehaviour {
         tiles.Clear();
     }
 }
+

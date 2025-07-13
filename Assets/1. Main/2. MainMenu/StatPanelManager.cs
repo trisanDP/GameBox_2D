@@ -48,7 +48,7 @@ public class StatsPanelManager : MonoBehaviour {
             case "KoiGame":
             return GetBest<KoiScoreEntry>("KoiGame");
             case "NumberGame":
-            return GetBest<NumberGameScoreEntry>("NumberGame");
+            return GetBest<NumberGameLevelScoreEntry>("NumberGame");
             case "ColorClash":
             return GetBest<ColorClashScoreEntry>("ColorClash");
             default:

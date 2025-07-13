@@ -115,11 +115,12 @@ public class KoiScoreEntry : ScoreEntry {
 
 
 [Serializable]
-public class NumberGameScoreEntry : ScoreEntry {
-    public int correctCount;
-    public int totalCount;
+public class NumberGameLevelScoreEntry : ScoreEntry {
+    public int levelPassed;
+    public int scorePerLevel;
+
     public override int GetScoreValue() {
-        return totalCount > 0 ? Mathf.RoundToInt((float)correctCount / totalCount * 100) : 0;
+        return levelPassed * scorePerLevel;
     }
 }
 
