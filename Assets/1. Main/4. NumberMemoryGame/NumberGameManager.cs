@@ -27,10 +27,9 @@ public class NumberGameManager : MonoBehaviour {
         NumberLevelManager.Instance.ResetLevel(startCount);
         uiManager = GetComponent<NumberUIManager>();
         uiManager.onPauseRequested += PauseGame;
-        StartRound();
     }
 
-    void StartRound() {
+    public void StartRound() {
         ClearTiles();
         occupiedRects.Clear();
         currentCount = NumberLevelManager.Instance.CurrentCount;

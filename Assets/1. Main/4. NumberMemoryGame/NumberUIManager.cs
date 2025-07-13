@@ -20,7 +20,12 @@ public class NumberUIManager : MonoBehaviour {
     public TMP_Text timeText;
     public event Action onPauseRequested;
 
+    public GameObject guidePanel;
+    public Button CloseButton;
+
+
     void Start() {
+        CloseButton.onClick.AddListener(OnCloseGuideButton);
         pauseButton.onClick.AddListener(() => onPauseRequested?.Invoke());
         retryButton.onClick.AddListener(() => { HideAllPanels(); FindFirstObjectByType<NumberGameManager>().OnRetry(); });
         menuButton_GameOver.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu"));
@@ -29,6 +34,12 @@ public class NumberUIManager : MonoBehaviour {
         menuButton_Pause.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu"));
         unpauseButton.onClick.AddListener(() => FindFirstObjectByType<NumberGameManager>().UnpauseGame());
         HideAllPanels();
+        guidePanel.SetActive(true);
+    }
+
+    void OnCloseGuideButton() {
+        guidePanel.SetActive(false);
+        FindFirstObjectByType<NumberGameManager>().StartRound();
     }
 
     public void SetLevel(int level) => levelText.text = "Level: " + level;

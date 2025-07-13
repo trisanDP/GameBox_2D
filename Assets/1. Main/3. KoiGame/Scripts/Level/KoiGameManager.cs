@@ -49,6 +49,10 @@ public class KoiGameManager : MonoBehaviour {
             boundary.height - halfSize.y * 2f
         );
 
+    }
+
+    public void StartGame() {
+
         SpawnEntities(levelParams.entityCount, levelParams.entitySpeed);
         LevelTimeRemaining = levelParams.entityCount * levelParams.cooldownDuration + extraTime;
         KoiUIManager.Instance.UpdateTimer(LevelTimeRemaining);
