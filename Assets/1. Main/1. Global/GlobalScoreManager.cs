@@ -130,4 +130,17 @@ public class ColorClashScoreEntry : ScoreEntry {
     public int finalScore;
     public override int GetScoreValue() => finalScore;
 }
+
 #endregion
+
+// ScoreEntry for persistence
+[Serializable]
+public class SymbolMatchScoreEntry : ScoreEntry {
+    public int totalScore;
+    public int correctCount;
+    public int totalTrials;
+    public float timeTaken;
+    public int roundsCompleted;
+
+    public override int GetScoreValue() => totalScore;
+}

@@ -31,6 +31,10 @@ public class KoiUIManager : MonoBehaviour {
     public Button nextLevelButton;
     public Button completeMenuButton;
 
+    [Header("Guide")]
+    public GameObject guidePanel;
+    public Button guideCloseButton;
+
     void Awake() {
         if(Instance == null) Instance = this;
         else Destroy(gameObject);
@@ -39,11 +43,16 @@ public class KoiUIManager : MonoBehaviour {
 
     void Start() {
         HideUI();
-
+        guideCloseButton.onClick.AddListener(OnGuideClose);
         pauseButton.onClick.AddListener(PauseGame);
         pauseResumeButton.onClick.AddListener(ResumeGame);
         pauseMainMenuButton.onClick.AddListener(KoiGameManager.Instance.ReturnToMenu);
+        guidePanel.SetActive(true);
+    }
 
+    public void OnGuideClose() {
+        FindFirstObjectByType<KoiGameManager>().StartGame();
+        guidePanel.SetActive(false);
     }
 
     public void HideUI() {
