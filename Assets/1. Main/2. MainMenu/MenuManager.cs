@@ -41,6 +41,8 @@ public class MenuManager : MonoBehaviour {
     public Button KoiGameButton;
     public Button NumberGameButton;
     public Button ColorClashGameButton;
+    public Button QuickAddGameButton;
+    public Button ShaperShifterGameButton;
 
 /*    public Button GameSelectionBackButton;*/
 
@@ -73,9 +75,11 @@ public class MenuManager : MonoBehaviour {
 *//*        ScoreBackBTN.onClick.AddListener(OnScoreBack);*/
 
         // game selection
-        KoiGameButton.onClick.AddListener(() => LoadScene("KoiGame_Attention"));
-        NumberGameButton.onClick.AddListener(() => LoadScene("NumberGame_Memory"));
-        ColorClashGameButton.onClick.AddListener(() => LoadScene("ColorClash_Inhivitory Control"));
+        KoiGameButton.onClick.AddListener(() => LoadScene("1. KoiGame_Attention"));
+        NumberGameButton.onClick.AddListener(() => LoadScene("2. NumberGame_Memory"));
+        ColorClashGameButton.onClick.AddListener(() => LoadScene("3. ColorClash_InhivitoryControl"));
+        QuickAddGameButton.onClick.AddListener(() => LoadScene("4. Game_QuickAdd"));
+        ShaperShifterGameButton.onClick.AddListener(() => LoadScene("5. Game_RuleSwitch"));
 /*        GameSelectionBackButton.onClick.AddListener(OnGameSelectBack);*/
     }
 

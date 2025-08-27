@@ -109,11 +109,15 @@ public class StatRange {
 public enum StatType {
     Memory,
     Attention,
-    Inhibition
+    Inhibition,
+    ProcessingSpeed,
+    CognitiveFlexibility
 }
 
 public enum GameType {
     KoiGame,
     NumberGame,
-    ColorClash
+    ColorClash,
+    QuickAdd,
+    ShapeShifter
 }

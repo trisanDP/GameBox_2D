@@ -9,14 +9,20 @@ EditorBuildSettings:
     path: Assets/2. Scene/MainMenu.unity
     guid: a5a4a73253fe18f479467dc14e1d655d
   - enabled: 1
-    path: Assets/2. Scene/KoiGame_Attention.unity
+    path: Assets/2. Scene/1. KoiGame_Attention.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
-    path: Assets/2. Scene/NumberGame_Memory.unity
+    path: Assets/2. Scene/2. NumberGame_Memory.unity
     guid: 775bb55d38589164192ac0eb2304aea1
   - enabled: 1
-    path: Assets/2. Scene/ColorClash_Inhivitory Control.unity
+    path: Assets/2. Scene/3. ColorClash_InhivitoryControl.unity
     guid: 1c448638b5a59c446814e0a5340edd75
+  - enabled: 1
+    path: Assets/2. Scene/4. Game_QuickAdd.unity
+    guid: 8952d65a77983bf429765e2fcc8e3a93
+  - enabled: 1
+    path: Assets/2. Scene/5. Game_RuleSwitch.unity
+    guid: 6536aeeae220084469aee0f7ab8af3fd
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: b183eb9b203a1fa439bc4a2be1dffa22, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 5a9587a13a63dee4caaa14f885fcd23f, type: 2}
