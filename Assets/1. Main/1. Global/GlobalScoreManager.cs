@@ -44,10 +44,10 @@ public class GlobalScoreManager : MonoBehaviour {
     }
 
     // ----- Public API (enum-based, preferred) -----
-    public void AddScore<T>(GameType gameType, T entry) where T : ScoreEntry {
+/*    public void AddScore<T>(GameType gameType, T entry) where T : ScoreEntry {
         AddScore(gameType.ToString(), entry);
     }
-
+*/
     public List<T> GetScores<T>(GameType gameType) where T : class {
         return GetScores<T>(gameType.ToString());
     }
