@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ public class MenuManager : MonoBehaviour {
     public GameObject gameSelectPanel;
     public GameObject optionsPanel;
     public GameObject scorePanel;
+    public GameObject AccountPanel;
 
     // Footer Menu Buttons
     [Header("FooterMenu Buttons")]
@@ -19,6 +21,7 @@ public class MenuManager : MonoBehaviour {
     public Button Games;
     public Button Option;
     public Button ScoreButton;
+    public Button AccountButton;
 
     //Home Menu Buttons
     [Header("Home Menu Buttons")]
@@ -54,12 +57,14 @@ public class MenuManager : MonoBehaviour {
         gameSelectPanel.SetActive(false);
         optionsPanel.SetActive(false);
         scorePanel.SetActive(false);
+        AccountPanel.SetActive(false);
 
         // Footer Menu Buttons
         Home.onClick.AddListener(OnHomeClicked);
         Games.onClick.AddListener(OnGameListClicked);
         Option.onClick.AddListener(OnOptionsClicked);
         ScoreButton.onClick.AddListener(OnScoreClicked);
+        AccountButton.onClick.AddListener(AccountButtonClicked);
 
         // Home Menu Buttons
         LetsPlay.onClick.AddListener(() => OnGameListClicked());
@@ -109,6 +114,7 @@ public class MenuManager : MonoBehaviour {
         gameSelectPanel.SetActive(false);
         optionsPanel.SetActive(false);
         scorePanel.SetActive(false);
+        AccountPanel.SetActive(false);
     }
 
 
@@ -119,6 +125,10 @@ public class MenuManager : MonoBehaviour {
 
     #endregion
 
+    public void AccountButtonClicked() {
+        CloseAllPanels();
+        AccountPanel.SetActive(true);
+    }
 
     #region Hold
 

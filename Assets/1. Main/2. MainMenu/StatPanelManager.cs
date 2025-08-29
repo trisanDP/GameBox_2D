@@ -53,8 +53,8 @@ public class StatsPanelManager : MonoBehaviour {
         }
 
         foreach(var mapping in statMappings) {
-            bool hasScores = GlobalScoreManager.Instance.HasScoresForGame(mapping.gameName);
-            int bestScore = GlobalScoreManager.Instance.GetBestScoreForGame(mapping.gameName);
+            bool hasScores = GlobalScoreManager.Instance.HasScoresForGame(mapping.gameType);
+            int bestScore = GlobalScoreManager.Instance.GetBestScoreForGame(mapping.gameType);
 
             if(bestScore <= 0 && hasScores) {
                 bestScore = GetBestScoreFallback(mapping);
@@ -110,22 +110,22 @@ public class StatsPanelManager : MonoBehaviour {
     private int GetBestScoreFallback(StatRange mapping) {
         switch(mapping.gameType) {
             case GameType.KoiGame:
-            return GetBest<KoiScoreEntry>(mapping.gameName);
+            return GetBest<KoiScoreEntry>(mapping.gameType);
             case GameType.NumberGame:
-            return GetBest<NumberGameLevelScoreEntry>(mapping.gameName);
+            return GetBest<NumberGameLevelScoreEntry>(mapping.gameType);
             case GameType.ColorClash:
-            return GetBest<ColorClashScoreEntry>(mapping.gameName);
+            return GetBest<ColorClashScoreEntry>(mapping.gameType);
             case GameType.QuickAdd:
-            return GetBest<FastMathScoreEntry>(mapping.gameName);
+            return GetBest<FastMathScoreEntry>(mapping.gameType);
             case GameType.ShapeShifter:
-            return GetBest<SymbolMatchScoreEntry>(mapping.gameName);
+            return GetBest<SymbolMatchScoreEntry>(mapping.gameType);
             default:
             return 0;
         }
     }
 
     // Generic typed getter
-    private int GetBest<T>(string game) where T : ScoreEntry {
+    private int GetBest<T>(GameType game) where T : ScoreEntry {
         Debug.Log("getting best score for " + game + " of type " + typeof(T).Name);
         var list = GlobalScoreManager.Instance.GetScores<T>(game);
         if(!list.Any()) return 0;
@@ -200,7 +200,7 @@ public class StatsPanelManager : MonoBehaviour {
 
 [System.Serializable]
 public class StatRange {
-    public string gameName;
+/*    public string gameName;*/
     public GameType gameType;
     public StatType statType;
     public int minScore;

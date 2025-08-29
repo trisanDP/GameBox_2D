@@ -10,6 +10,7 @@ public class ColorClashGameManager : MonoBehaviour {
     #region Singleton
     public static ColorClashGameManager Instance { get; private set; }
     private void Awake() {
+        Time.timeScale = 1f;
         if(Instance == null) Instance = this;
         else Destroy(gameObject);
     }

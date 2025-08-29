@@ -20,7 +20,8 @@ public class KoiGameManager : MonoBehaviour {
 
 
     void Awake() {
-        // Ensure a fresh GameManager each scene load
+        // Ensure a fresh GameManager each scene load\
+        Time.timeScale = 1f;
         if(Instance == null) {
             Instance = this;
         } else {

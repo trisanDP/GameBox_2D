@@ -181,8 +181,8 @@ public class GlobalScoreManager : MonoBehaviour {
         }
     }
     // Add this method to GlobalScoreManager
-    public bool HasScoresForGame(string gameName) {
-        var game = allScores.games.Find(g => g.gameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+    public bool HasScoresForGame(GameType gameName) {
+        var game = allScores.games.Find(g => g.gameName.Equals(gameName.ToString(), StringComparison.OrdinalIgnoreCase));
         return game != null && game.entriesJson != null && game.entriesJson.Count > 0;
     }
 }

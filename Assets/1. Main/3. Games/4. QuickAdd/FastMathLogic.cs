@@ -83,7 +83,7 @@ public class FastMathLogic : MonoBehaviour {
                 levelIndex = currentLevel,
                 earnedPoints = settings.pointsOnCorrect
             };
-            GlobalScoreManager.Instance.AddScore("FastMath", entry);
+            GlobalScoreManager.Instance.AddScore("QuickMath", entry);
         }
         FastMathUIManager.Instance.ShowResult(correct, correct ? levels[currentLevel].pointsOnCorrect : 0);
     }
