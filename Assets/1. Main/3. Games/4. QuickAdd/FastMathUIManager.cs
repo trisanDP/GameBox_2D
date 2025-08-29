@@ -26,6 +26,8 @@ public class FastMathUIManager : MonoBehaviour {
     public TextMeshProUGUI resultTextRetry;
     public Button nextLevelButton;
     public Button retryButton;
+    public Button mainMenu;
+    public Button MainMenuReady;
 
     [Header("Tutorial")]
     public Button tutorialOk;
@@ -44,6 +46,8 @@ public class FastMathUIManager : MonoBehaviour {
         nextLevelButton.onClick.AddListener(() => OnNextLevel());
         retryButton.onClick.AddListener(() => OnRetryLevel());
         tutorialOk.onClick.AddListener(() => OnTutorialOk());
+        mainMenu.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu"));
+        MainMenuReady.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu"));
         ShowTutorial();
     }
 

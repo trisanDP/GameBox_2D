@@ -14,11 +14,15 @@ public class ScoreUIManager : MonoBehaviour {
     public GameObject koiPanel;
     public GameObject numberPanel;
     public GameObject colorClashPanel;
+    public GameObject fastMathPanel;
+    public GameObject shapeShifterPanel;    
 
     [Header("Content Parents")]
     public RectTransform koiContent;
     public RectTransform numberContent;
     public RectTransform colorClashContent;
+    public RectTransform fastMathContent;
+    public RectTransform shapeShifterContent;
 
     [Header("Score Item Prefab")]
     public GameObject scoreItemPrefab;
@@ -27,6 +31,8 @@ public class ScoreUIManager : MonoBehaviour {
     public Button koiButton;
     public Button numberButton;
     public Button colorClashButton;
+    public Button quickAddButton;
+    public Button shapeShifterButton;
 
     public List<Button> backButton;
 
@@ -35,16 +41,25 @@ public class ScoreUIManager : MonoBehaviour {
     public Button deleteKoiScoresButton;
     public Button deleteNumberGameScoresButton;
     public Button deleteColorClashScoresButton;
+    public Button deleteFastMathScoreButton;
+    public Button deleteShapeshifterScoreButton;
 
     private void Start() {
         // Initialize buttons
         koiButton.onClick.AddListener(() => ShowPanel(koiPanel));
         numberButton.onClick.AddListener(() => ShowPanel(numberPanel));
         colorClashButton.onClick.AddListener(() => ShowPanel(colorClashPanel));
+        quickAddButton.onClick.AddListener(() => ShowPanel(fastMathPanel));
+        shapeShifterButton.onClick.AddListener(() => ShowPanel(shapeShifterPanel));
+
 
         deleteKoiScoresButton.onClick.AddListener(DeleteKoiScores);
         deleteNumberGameScoresButton.onClick.AddListener(DeleteNumberGameScores);
         deleteColorClashScoresButton.onClick.AddListener(DeleteColorClashScores);
+        deleteFastMathScoreButton.onClick.AddListener(DeleteFastMathScore);
+        deleteShapeshifterScoreButton.onClick.AddListener(DeleteShapeShifter);
+
+
 
         foreach(var btn in backButton) {
             btn.onClick.AddListener(OnBackFromPanel);
@@ -59,6 +74,8 @@ public class ScoreUIManager : MonoBehaviour {
         koiPanel.SetActive(panel == koiPanel);
         numberPanel.SetActive(panel == numberPanel);
         colorClashPanel.SetActive(panel == colorClashPanel);
+        fastMathPanel.SetActive(panel == fastMathPanel);
+        shapeShifterPanel.SetActive(panel == shapeShifterPanel);
     }
 
 
@@ -68,6 +85,8 @@ public class ScoreUIManager : MonoBehaviour {
         koiPanel.SetActive(false);
         numberPanel.SetActive(false);
         colorClashPanel.SetActive(false);
+        fastMathPanel.SetActive(false);
+        shapeShifterPanel.SetActive(false);
     }
 
 
@@ -85,6 +104,8 @@ public class ScoreUIManager : MonoBehaviour {
         PopulateKoi();
         PopulateNumberGame();
         PopulateColorClash();
+        PopulateFastMath();
+        PopulateShapeShifter(); 
     }
 
     private void PopulateKoi() {
@@ -125,7 +146,32 @@ public class ScoreUIManager : MonoBehaviour {
             CreateItem(colorClashContent, i + 1, sorted[i].GetScoreValue());
         }
     }
+    
+    private void PopulateFastMath() {
+        ClearChildren(fastMathContent);
+        var list = GlobalScoreManager.Instance?.GetScores<FastMathScoreEntry>("QuickAdd");
+        if(list == null || list.Count == 0) {
+            CreateItem(fastMathContent, 1, 0);
+            return;
+        }
+        var sorted = list.OrderByDescending(e => e.GetScoreValue()).ToList();
+        for(int i = 0; i < sorted.Count; i++) {
+            CreateItem(fastMathContent, i + 1, sorted[i].GetScoreValue());
+        }
+    }
 
+    private void PopulateShapeShifter() { 
+        ClearChildren(shapeShifterContent);
+        var list = GlobalScoreManager.Instance?.GetScores<SymbolMatchScoreEntry>("ShapeShifter");
+        if(list == null || list.Count == 0) {
+            CreateItem(shapeShifterContent, 1, 0);
+            return;
+        }
+        var sorted = list.OrderByDescending(e => e.GetScoreValue()).ToList();
+        for(int i = 0; i < sorted.Count; i++) {
+            CreateItem(shapeShifterContent, i + 1, sorted[i].GetScoreValue());
+        }
+    }
 
     #region Delete Scores
     void DeleteKoiScores() {
@@ -146,6 +192,17 @@ public class ScoreUIManager : MonoBehaviour {
         PopulateColorClash();
     }
 
+    void DeleteShapeShifter() {
+        GlobalScoreManager.Instance?.ClearAllScores();
+        StatsPanelManager.Instance?.UpdateStats();
+        PopulateColorClash();
+    }
+
+    void DeleteFastMathScore() {
+        GlobalScoreManager.Instance?.ClearAllScores();
+        StatsPanelManager.Instance?.UpdateStats();
+        PopulateFastMath();
+    }
     #endregion
     private void ClearChildren(Transform parent) {
         foreach(Transform child in parent) {

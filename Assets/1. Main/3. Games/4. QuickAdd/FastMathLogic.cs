@@ -14,19 +14,7 @@ public class FastMathLevelSettings {
     [Tooltip("Maximum value for generated numbers")] public int maxValue;
 }
 
-[Serializable]
-public class FastMathScoreEntry : ScoreEntry {
-    public int levelIndex;
-    public int earnedPoints;
 
-    public FastMathScoreEntry() {
-        timestamp = DateTime.UtcNow.ToString("o");
-    }
-
-    public override int GetScoreValue() {
-        return earnedPoints;
-    }
-}
 
 
 public class FastMathLogic : MonoBehaviour {

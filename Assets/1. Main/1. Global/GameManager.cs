@@ -20,6 +20,49 @@ public class GameManager : MonoBehaviour {
         GlobalSceneManager.Instance.LoadSceneByGameState(state);
     }
 
+    public void ActiveState() {
+        switch(currentState) {
+            case AppState.MainMenu:
+            HandleMenuLogic();
+            break;
+            case AppState.Game1_KoiGame:
+            HandleGame1Logic();
+            break;
+            case AppState.Game2_NumberGame:
+            HandleGame2Logic();
+            break;
+            case AppState.Game3_ColorClash:
+            HandleGame3Logic();
+            break;
+            case AppState.Game4_QuickAdd:
+            HandleGame4Logic();
+            break;
+            case AppState.Game5_RuleSwitch:
+            HandleGame5Logic();
+            break;
+        }
+    }
+
+    private void HandleMenuLogic() {
+
+    }
+
+    private void HandleGame1Logic() {
+
+    }
+    private void HandleGame2Logic() {
+
+    }
+    private void HandleGame3Logic() {
+
+    }
+    private void HandleGame4Logic() {
+
+    }
+    private void HandleGame5Logic() {
+
+    }
+
 }
 
 public enum AppState {
