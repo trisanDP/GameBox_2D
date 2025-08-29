@@ -54,6 +54,9 @@ public class StatsPanelManager : MonoBehaviour {
 
         foreach(var mapping in statMappings) {
             bool hasScores = GlobalScoreManager.Instance.HasScoresForGame(mapping.gameType);
+            if(!hasScores) {
+                Debug.LogWarning($"No scores found for game {mapping.gameType}.");
+            }
             int bestScore = GlobalScoreManager.Instance.GetBestScoreForGame(mapping.gameType);
 
             if(bestScore <= 0 && hasScores) {
@@ -82,7 +85,7 @@ public class StatsPanelManager : MonoBehaviour {
         return "High";
     }
 
-    // Helper to inspect stored bucket (for debug only)
+/*    // Helper to inspect stored bucket (for debug only)
     private GameScoresJson GetGameBucketDebug(string gameName) {
         // access private field via GlobalScoreManager reflection would be messy — instead add a helper in GlobalScoreManager later.
         // For now, attempt to call GetScores<ScoreEntry> to inspect count (best-effort).
@@ -102,9 +105,9 @@ public class StatsPanelManager : MonoBehaviour {
                     return fake;
                 }
             }
-        } catch { /* ignore */ }
+        } catch { *//* ignore *//* }
         return null;
-    }
+    }*/
 
     // Fallback: attempt typed parsing using the mapping's GameType
     private int GetBestScoreFallback(StatRange mapping) {

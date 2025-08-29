@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [DisallowMultipleComponent]
-public class RuleSwitchGameManager : GameStateManager {
+public class SymbolMatchGameManager : GameStateManager {
     [Header("Core references")]
     public SymbolMatchGameLogic logic;
     public SymbolMatchGameUI ui;
@@ -219,7 +219,7 @@ public class RuleSwitchGameManager : GameStateManager {
 
             string name = (logic != null && !string.IsNullOrEmpty(logic.gameName)) ? logic.gameName : "SymbolMatch";
             if(GlobalScoreManager.Instance != null) {
-                GlobalScoreManager.Instance.AddScore(name, entry);
+                GlobalScoreManager.Instance.AddScore(GameType.ShapeShifter, entry);
                 Debug.Log($"Saved score for {name}: {entry.totalScore} pts");
             } else {
                 Debug.LogWarning("GlobalScoreManager.Instance is null — score not saved.");

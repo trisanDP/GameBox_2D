@@ -134,7 +134,7 @@ public class KoiGameManager : MonoBehaviour {
             timeLeft = LevelTimeRemaining,
             timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
-        GlobalScoreManager.Instance.AddScore("KoiGame", entry);
+        GlobalScoreManager.Instance.AddScore(GameType.KoiGame, entry);
 
         if(success) KoiUIManager.Instance.ShowLevelComplete(fedCount, levelParams.entityCount, LevelTimeRemaining);
         else KoiUIManager.Instance.ShowGameOver();

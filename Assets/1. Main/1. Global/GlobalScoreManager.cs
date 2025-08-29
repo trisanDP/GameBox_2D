@@ -6,7 +6,7 @@ using System.Linq;
 
 [Serializable]
 public class GameScoresJson {
-    public string gameName;
+    public GameType gameType;                   // enum instead of string
     public List<string> entriesJson = new List<string>();
 }
 
@@ -14,6 +14,7 @@ public class GameScoresJson {
 public class AllGameScoresJson {
     public List<GameScoresJson> games = new List<GameScoresJson>();
 }
+
 
 [Serializable]
 public class ScoreRecord {
@@ -23,10 +24,6 @@ public class ScoreRecord {
     public string rawJson;      // optional
 }
 
-/// <summary>
-/// Centralized, simple score manager. Use GameType-based API.
-/// Stores small stable ScoreRecord wrappers so future changes to entry classes won't break stored data.
-/// </summary>
 public class GlobalScoreManager : MonoBehaviour {
     public static GlobalScoreManager Instance { get; private set; }
 
@@ -43,26 +40,9 @@ public class GlobalScoreManager : MonoBehaviour {
         }
     }
 
-    // ----- Public API (enum-based, preferred) -----
-/*    public void AddScore<T>(GameType gameType, T entry) where T : ScoreEntry {
-        AddScore(gameType.ToString(), entry);
-    }
-*/
-    public List<T> GetScores<T>(GameType gameType) where T : class {
-        return GetScores<T>(gameType.ToString());
-    }
-
-    public int GetBestScoreForGame(GameType gameType) {
-        return GetBestScoreForGame(gameType.ToString());
-    }
-
-    public void ClearScoresForGame(GameType gameType) {
-        ClearScoresForGame(gameType.ToString());
-    }
-
-    // ----- Internal/string-based (keeps storage human readable) -----
-    public void AddScore<T>(string gameName, T entry) where T : ScoreEntry {
-        if(string.IsNullOrEmpty(gameName) || entry == null) return;
+    // ----- Public API (enum-based) -----
+    public void AddScore<T>(GameType gameType, T entry) where T : ScoreEntry {
+        if(entry == null) return;
 
         var record = new ScoreRecord {
             scoreValue = entry.GetScoreValue(),
@@ -73,9 +53,9 @@ public class GlobalScoreManager : MonoBehaviour {
 
         string recordJson = JsonUtility.ToJson(record);
 
-        var bucket = allScores.games.Find(g => g.gameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+        var bucket = allScores.games.Find(g => g.gameType == gameType);
         if(bucket == null) {
-            bucket = new GameScoresJson { gameName = gameName };
+            bucket = new GameScoresJson { gameType = gameType };
             allScores.games.Add(bucket);
         }
 
@@ -83,57 +63,41 @@ public class GlobalScoreManager : MonoBehaviour {
         SaveAllScores();
     }
 
-    public int GetBestScoreForGame(string gameName) {
-        var bucket = allScores.games.Find(g => g.gameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+    public int GetBestScoreForGame(GameType gameType) {
+        var bucket = allScores.games.Find(g => g.gameType == gameType);
         if(bucket == null || bucket.entriesJson == null || bucket.entriesJson.Count == 0) return 0;
 
         int best = 0;
         foreach(var json in bucket.entriesJson) {
             if(string.IsNullOrEmpty(json)) continue;
 
-            // parse as wrapper (fast path)
+            // wrapper path
             try {
                 var rec = JsonUtility.FromJson<ScoreRecord>(json);
                 if(rec != null && (rec.scoreValue != 0 || !string.IsNullOrEmpty(rec.rawJson) || !string.IsNullOrEmpty(rec.originalType))) {
                     best = Math.Max(best, rec.scoreValue);
                     continue;
                 }
-            } catch { /* ignore */ }
+            } catch { }
 
-            // fallback: try legacy entry shapes (minimal checks)
-            try {
-                var c = JsonUtility.FromJson<ColorClashScoreEntry>(json);
-                if(c != null && c.finalScore != 0) { best = Math.Max(best, c.GetScoreValue()); continue; }
-            } catch { }
-            try {
-                var k = JsonUtility.FromJson<KoiScoreEntry>(json);
-                if(k != null && (k.fedCount != 0 || k.totalEntities != 0)) { best = Math.Max(best, k.GetScoreValue()); continue; }
-            } catch { }
-            try {
-                var n = JsonUtility.FromJson<NumberGameLevelScoreEntry>(json);
-                if(n != null && (n.levelPassed != 0 || n.scorePerLevel != 0)) { best = Math.Max(best, n.GetScoreValue()); continue; }
-            } catch { }
-            try {
-                var f = JsonUtility.FromJson<FastMathScoreEntry>(json);
-                if(f != null && f.earnedPoints != 0) { best = Math.Max(best, f.GetScoreValue()); continue; }
-            } catch { }
-            try {
-                var s = JsonUtility.FromJson<SymbolMatchScoreEntry>(json);
-                if(s != null && s.totalScore != 0) { best = Math.Max(best, s.GetScoreValue()); continue; }
-            } catch { }
+            // fallback parsing
+            try { var c = JsonUtility.FromJson<ColorClashScoreEntry>(json); if(c != null && c.finalScore != 0) { best = Math.Max(best, c.GetScoreValue()); continue; } } catch { }
+            try { var k = JsonUtility.FromJson<KoiScoreEntry>(json); if(k != null && (k.fedCount != 0 || k.totalEntities != 0)) { best = Math.Max(best, k.GetScoreValue()); continue; } } catch { }
+            try { var n = JsonUtility.FromJson<NumberGameLevelScoreEntry>(json); if(n != null && (n.levelPassed != 0 || n.scorePerLevel != 0)) { best = Math.Max(best, n.GetScoreValue()); continue; } } catch { }
+            try { var f = JsonUtility.FromJson<FastMathScoreEntry>(json); if(f != null && f.earnedPoints != 0) { best = Math.Max(best, f.GetScoreValue()); continue; } } catch { }
+            try { var s = JsonUtility.FromJson<SymbolMatchScoreEntry>(json); if(s != null && s.totalScore != 0) { best = Math.Max(best, s.GetScoreValue()); continue; } } catch { }
         }
         return best;
     }
 
-    public List<T> GetScores<T>(string gameName) where T : class {
+    public List<T> GetScores<T>(GameType gameType) where T : class {
         var result = new List<T>();
-        var bucket = allScores.games.Find(g => g.gameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+        var bucket = allScores.games.Find(g => g.gameType == gameType);
         if(bucket == null || bucket.entriesJson == null) return result;
 
         foreach(var json in bucket.entriesJson) {
             if(string.IsNullOrEmpty(json)) continue;
 
-            // try wrapper first
             try {
                 var rec = JsonUtility.FromJson<ScoreRecord>(json);
                 if(rec != null && !string.IsNullOrEmpty(rec.rawJson)) {
@@ -142,7 +106,6 @@ public class GlobalScoreManager : MonoBehaviour {
                 }
             } catch { }
 
-            // try direct parse
             try {
                 var direct = JsonUtility.FromJson<T>(json);
                 if(direct != null) { result.Add(direct); continue; }
@@ -157,8 +120,8 @@ public class GlobalScoreManager : MonoBehaviour {
         PlayerPrefs.Save();
     }
 
-    public void ClearScoresForGame(string gameName) {
-        allScores.games.RemoveAll(g => g.gameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+    public void ClearScoresForGame(GameType gameType) {
+        allScores.games.RemoveAll(g => g.gameType == gameType);
         SaveAllScores();
     }
 
@@ -180,9 +143,9 @@ public class GlobalScoreManager : MonoBehaviour {
             allScores = new AllGameScoresJson();
         }
     }
-    // Add this method to GlobalScoreManager
-    public bool HasScoresForGame(GameType gameName) {
-        var game = allScores.games.Find(g => g.gameName.Equals(gameName.ToString(), StringComparison.OrdinalIgnoreCase));
+
+    public bool HasScoresForGame(GameType gameType) {
+        var game = allScores.games.Find(g => g.gameType == gameType);
         return game != null && game.entriesJson != null && game.entriesJson.Count > 0;
     }
 }

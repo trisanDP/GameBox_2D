@@ -6,7 +6,7 @@ public enum SymbolType { Circle = 0, Triangle = 1, Rectangle = 2 }
 
 public class SymbolMatchGameLogic : MonoBehaviour {
     [Header("Rounds")]
-    public string gameName = "SymbolMatch";
+    public string gameName = "ShapeShifter";
     public int totalRounds = 3;
     public int initialSymbolsPerRound = 10;
     public int symbolsPerRoundIncrement = 2;
@@ -131,7 +131,7 @@ public class SymbolMatchGameLogic : MonoBehaviour {
         float totalTime = Time.realtimeSinceStartup - gameStartRealtime;
         IsRunning = false;
         OnGameComplete?.Invoke(TotalScore, TotalCorrect, totalTime);
-        TrySaveScore(totalTime);
+/*        TrySaveScore(totalTime);*/
     }
 
     private IEnumerator WaitRealtimeFor(float seconds) {
@@ -181,7 +181,7 @@ public class SymbolMatchGameLogic : MonoBehaviour {
         public override int GetScoreValue() => totalScore;
     }
 
-    private void TrySaveScore(float totalTime) {
+/*    private void TrySaveScore(float totalTime) {
         try {
             var entry = new SymbolMatchScoreEntry {
                 timestamp = DateTime.UtcNow.ToString("o"),
@@ -191,12 +191,12 @@ public class SymbolMatchGameLogic : MonoBehaviour {
                 timeTaken = totalTime,
                 roundsCompleted = totalRounds
             };
-            if(GlobalScoreManager.Instance != null) GlobalScoreManager.Instance.AddScore(gameName, entry);
+            if(GlobalScoreManager.Instance != null) GlobalScoreManager.Instance.AddScore(GameType.ShapeShifter, entry);
         } catch(Exception ex) {
             Debug.LogWarning("Failed saving score: " + ex.Message);
         }
     }
-
+*/
     private SymbolType PickRandomSymbol() {
         int v = UnityEngine.Random.Range(0, 3);
         return (SymbolType)v;

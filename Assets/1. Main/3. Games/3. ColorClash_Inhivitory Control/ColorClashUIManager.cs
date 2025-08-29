@@ -152,7 +152,7 @@ public class ColorClashUIManager : MonoBehaviour {
         finalScoreText.text = "Score: " + finalScore.ToString();
         // Save score
         var entry = new ColorClashScoreEntry { finalScore = finalScore, timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") };
-        GlobalScoreManager.Instance.AddScore("ColorClash", entry);
+        GlobalScoreManager.Instance.AddScore(GameType.ColorClash, entry);
     }
 
     private Color GetFromPredefined(string name) {

@@ -111,7 +111,7 @@ public class NumberGameManager : MonoBehaviour {
             levelPassed = levelsPassed,
             scorePerLevel = scorePerLevel
         };
-        GlobalScoreManager.Instance.AddScore("NumberGame", entry);
+        GlobalScoreManager.Instance.AddScore(GameType.NumberGame, entry);
         Debug.Log($"Recorded NumberGame score: {entry.GetScoreValue()}");
     }
 
