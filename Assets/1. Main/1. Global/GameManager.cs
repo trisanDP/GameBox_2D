@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour {
 
     public void ActiveState() {
         switch(currentState) {
-            case AppState.MainMenu:
+            case AppState.MainMenu1:
             HandleMenuLogic();
             break;
             case AppState.Game1_KoiGame:
@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour {
 }
 
 public enum AppState {
-    MainMenu,
+    MainMenu1,
     Game1_KoiGame,
     Game2_NumberGame,
     Game3_ColorClash,

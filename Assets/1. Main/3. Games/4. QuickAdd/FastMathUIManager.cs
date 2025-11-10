@@ -46,8 +46,8 @@ public class FastMathUIManager : MonoBehaviour {
         nextLevelButton.onClick.AddListener(() => OnNextLevel());
         retryButton.onClick.AddListener(() => OnRetryLevel());
         tutorialOk.onClick.AddListener(() => OnTutorialOk());
-        mainMenu.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu"));
-        MainMenuReady.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu"));
+        mainMenu.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu1"));
+        MainMenuReady.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu1"));
         ShowTutorial();
     }
 

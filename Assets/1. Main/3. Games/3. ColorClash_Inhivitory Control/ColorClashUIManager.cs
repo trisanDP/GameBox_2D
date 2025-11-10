@@ -179,7 +179,7 @@ public class ColorClashUIManager : MonoBehaviour {
     }
     public void ReturnToMenu() {
         Debug.Log("Returning to Main Menu");
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("MainMenu1");
     }
 
     public void TryAgain() {

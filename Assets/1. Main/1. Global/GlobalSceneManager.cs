@@ -24,7 +24,7 @@ public class GlobalSceneManager : MonoBehaviour {
 
     private string GetSceneNameFromGameState(AppState state) {
         switch(state) {
-            case AppState.MainMenu:
+            case AppState.MainMenu1:
             return "MainMenuScene";
             case AppState.Game1_KoiGame:
             return "KoiGameScene";

@@ -9,7 +9,7 @@ using UnityEngine.UI;
 #region --- MenuManager.cs ---
 public class MenuManager : MonoBehaviour {
     [Header("Panels")]
-    public GameObject mainPanel;
+/*    public GameObject mainPanel;*/
     public GameObject gameSelectPanel;
     public GameObject optionsPanel;
     public GameObject scorePanel;
@@ -53,14 +53,14 @@ public class MenuManager : MonoBehaviour {
 
     void Start() {
         // init panels
-        mainPanel.SetActive(true);
-        gameSelectPanel.SetActive(false);
+/*        mainPanel.SetActive(true);*/
+        gameSelectPanel.SetActive(true);
         optionsPanel.SetActive(false);
         scorePanel.SetActive(false);
         AccountPanel.SetActive(false);
 
         // Footer Menu Buttons
-        Home.onClick.AddListener(OnHomeClicked);
+/*        Home.onClick.AddListener(OnHomeClicked);*/
         Games.onClick.AddListener(OnGameListClicked);
         Option.onClick.AddListener(OnOptionsClicked);
         ScoreButton.onClick.AddListener(OnScoreClicked);
@@ -91,11 +91,11 @@ public class MenuManager : MonoBehaviour {
 
 
     #region FooterButtons Functions
-    void OnHomeClicked() {
+/*    void OnHomeClicked() {
         CloseAllPanels();
         mainPanel.SetActive(true);
     }
-
+*/
     private void OnGameListClicked() {
         CloseAllPanels();
         gameSelectPanel.SetActive(true);
@@ -110,7 +110,7 @@ public class MenuManager : MonoBehaviour {
     }
 
     void CloseAllPanels() {
-        mainPanel.SetActive(false);
+/*        mainPanel.SetActive(false);*/
         gameSelectPanel.SetActive(false);
         optionsPanel.SetActive(false);
         scorePanel.SetActive(false);

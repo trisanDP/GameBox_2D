@@ -9,7 +9,7 @@ public class SymbolMatchGameManager : GameStateManager {
     public SymbolMatchGameUI ui;
 
     [Header("Config")]
-    public string mainMenuSceneName = "MainMenu";
+    public string mainMenuSceneName = "MainMenu1";
 
     private Coroutine countdownRoutine;
     private bool stateInitialized = false;

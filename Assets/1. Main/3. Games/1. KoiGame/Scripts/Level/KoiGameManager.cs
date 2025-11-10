@@ -143,5 +143,5 @@ public class KoiGameManager : MonoBehaviour {
     // UI button handlers
     public void RetryLevel() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     public void NextLevel() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    public void ReturnToMenu() => SceneManager.LoadScene("MainMenu");
+    public void ReturnToMenu() =>  SceneManager.LoadScene("MainMenu1");
 }

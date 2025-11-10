@@ -5,9 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/2. Scene/MainMenu.unity
     guid: a5a4a73253fe18f479467dc14e1d655d
+  - enabled: 1
+    path: Assets/2. Scene/MainMenu1.unity
+    guid: a35c727fca181574bb81c4a04e3f6abe
   - enabled: 1
     path: Assets/2. Scene/1. KoiGame_Attention.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
